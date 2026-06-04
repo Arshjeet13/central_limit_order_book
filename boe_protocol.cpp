@@ -26,6 +26,19 @@ namespace boe
         uint32_t sequence_number{};
     };
 
+    // From section 2.4 : if no data has been sent in either direction for 1 second, 
+    // both sides send heartbeats. If the server receives nothing from you for 5 seconds
+    // it sends a Logout and closes the connection.
+    struct client_hearbeat
+    {
+        uint16_t start_of_message{0xBABA};
+        uint16_t message_length{8}; // The message length does not include the 2 start_of_message bytes
+        uint8_t  message_type{0x37};
+        uint8_t  matching_unit{};
+        uint32_t sequence_number{};
+    };
+
+
     
 
     #pragma pack(pop)
