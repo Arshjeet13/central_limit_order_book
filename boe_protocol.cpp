@@ -45,13 +45,15 @@ namespace boe
         uint8_t  message_type{0x37};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
-        char login_response_status[1]{};
-        char login_response_text[60]{};
-        uint8_t no_unspecified_unit_replay{};
+        char     login_response_status[1]{};
+        char     login_response_text[60]{};
+        uint8_t  no_unspecified_unit_replay{};
         uint32_t last_received_sequence_number{};
-        uint8_t number_of_units{0x00};
+        uint8_t  number_of_units{0x00};
         uint8_t  number_of_param_groups{0x00};
     };    
+
+    
 
     #pragma pack(pop)
 }
