@@ -14,7 +14,7 @@ namespace boe
         char     session_sub_id[4]{};
         char     username[4]{};
         char     password[10]{};
-        uint8_t  number_of_param_groups{0};
+        uint8_t  number_of_param_groups{0x00};
     };
 
     struct logout_request
@@ -38,8 +38,20 @@ namespace boe
         uint32_t sequence_number{};
     };
 
-
-    
+    struct login_response
+    {
+        uint16_t start_of_message{0xBABA};
+        uint16_t message_length{}; // The message length does not include the 2 start_of_message bytes
+        uint8_t  message_type{0x37};
+        uint8_t  matching_unit{};
+        uint32_t sequence_number{};
+        char login_response_status[1]{};
+        char login_response_text[60]{};
+        uint8_t no_unspecified_unit_replay{};
+        uint32_t last_received_sequence_number{};
+        uint8_t number_of_units{0x00};
+        uint8_t  number_of_param_groups{0x00};
+    };    
 
     #pragma pack(pop)
 }
