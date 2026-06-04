@@ -7,7 +7,7 @@ namespace boe
     struct login_request
     {
         uint16_t start_of_message{0xBABA};
-        uint16_t message_length{27}; // The message length does not include the start of message byte
+        uint16_t message_length{27}; // The message length does not include the 2 start_of_message bytes
         uint8_t  message_type{0x37};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
@@ -16,6 +16,17 @@ namespace boe
         char     password[10]{};
         uint8_t  number_of_param_groups{0};
     };
+
+    struct logout_request
+    {
+        uint16_t start_of_message{0xBABA};
+        uint16_t message_length{8}; // The message length does not include the 2 start_of_message bytes
+        uint8_t  message_type{0x37};
+        uint8_t  matching_unit{};
+        uint32_t sequence_number{};
+    };
+
+    
 
     #pragma pack(pop)
 }
