@@ -6,16 +6,15 @@
 #include <cstring>        // memcpy
 #include <cstdint>        // uint8_t, uint16_t
 #include <vector>         // message buffer
-#include <netinet/in.h>   // ntohs/l() and htons/l()
 
-bool recv_exact(int fd, uint8_t* buf, int n_bytes){
+bool recv_exact(int fd, uint8_t* buffer, int n_bytes){
     while(n_bytes > 0){
-        int received = recv(fd, buf, n_bytes, 0);
+        int received = recv(fd, buffer, n_bytes, 0);
         if(received <= 0){
             return false;
         }
         n_bytes -= received;
-        buf = (uint8_t*)((char*)buf + received);
+        buffer = (uint8_t*)((char*)buffer + received);
     }
     return true;
 }
@@ -42,7 +41,8 @@ void run_session(int fd){
             break;
         }
 
-        // some parse function
-
+        // TO DO : some parse function
+        // TO DO : make Session object
+                        
     }
 }
