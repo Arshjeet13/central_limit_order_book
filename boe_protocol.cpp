@@ -75,7 +75,13 @@ namespace boe
 
     struct cancel_order
     {
-        
+        uint16_t start_of_message{0xBABA};
+        uint16_t message_length{};
+        uint8_t  message_type{0x37};
+        uint8_t  matching_unit{};
+        uint32_t sequence_number{};
+        char     client_order_id[20]{};
+        uint8_t  number_of_cancel_order_bitfields{1};
     };
 
     #pragma pack(pop)
