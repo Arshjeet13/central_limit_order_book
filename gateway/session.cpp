@@ -14,7 +14,7 @@ bool recv_exact(int fd, uint8_t* buffer, int n_bytes){
             return false;
         }
         n_bytes -= received;
-        buffer = (uint8_t*)((char*)buffer + received);
+        buffer = buffer + received;
     }
     return true;
 }
