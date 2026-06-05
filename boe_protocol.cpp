@@ -8,7 +8,7 @@ namespace boe
     {
         uint16_t start_of_message{0xBABA};
         uint16_t message_length{27}; 
-        uint8_t  message_type{0x37};
+        uint8_t  message_type{};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     session_sub_id[4]{};
@@ -21,7 +21,7 @@ namespace boe
     {
         uint16_t start_of_message{0xBABA};
         uint16_t message_length{8};
-        uint8_t  message_type{0x37};
+        uint8_t  message_type{};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
     };
@@ -33,7 +33,7 @@ namespace boe
     {
         uint16_t start_of_message{0xBABA};
         uint16_t message_length{8};
-        uint8_t  message_type{0x37};
+        uint8_t  message_type{};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
     };
@@ -42,7 +42,7 @@ namespace boe
     {
         uint16_t start_of_message{0xBABA};
         uint16_t message_length{};
-        uint8_t  message_type{0x37};
+        uint8_t  message_type{};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     login_response_status[1]{};
@@ -57,7 +57,7 @@ namespace boe
     {
         uint16_t start_of_message{0xBABA};
         uint16_t message_length{};
-        uint8_t  message_type{0x37};
+        uint8_t  message_type{};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     client_order_id[20]{};
@@ -66,8 +66,7 @@ namespace boe
         uint8_t  number_of_new_order_bitfields{1};
         uint8_t  bitfield1{0x14};  // Price + OrdType
         uint8_t  bitfield2{0x41};  // Symbol + Capacity
-        // optional fields
-        int64_t  price{};          // Binary Price
+        int64_t  price{};          
         char     ord_type{};       // '1' = Market, '2' = Limit
         char     symbol[8]{};     
         char     capacity{'C'};
@@ -77,11 +76,25 @@ namespace boe
     {
         uint16_t start_of_message{0xBABA};
         uint16_t message_length{};
-        uint8_t  message_type{0x37};
+        uint8_t  message_type{};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     client_order_id[20]{};
         uint8_t  number_of_cancel_order_bitfields{1};
+    };
+
+    struct order_acknowledgement
+    {
+        uint16_t start_of_message{0xBABA};
+        uint16_t message_length{};
+        uint8_t  message_type{};
+        uint8_t  matching_unit{0x00};
+        uint32_t sequence_number{};
+        uint64_t transaction_time{};    
+        char     client_order_id[20]{};       
+        uint64_t order_id{};            
+        uint8_t  reserved_internal{0x00};
+        uint8_t  num_return_bitfields{0};
     };
 
     #pragma pack(pop)
