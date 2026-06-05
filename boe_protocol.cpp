@@ -97,5 +97,20 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
 
+    struct order_rejected
+    {
+        uint16_t start_of_message{0xBABA};
+        uint16_t message_length{};
+        uint8_t  message_type{};
+        uint8_t  matching_unit{0x00};
+        uint32_t sequence_number{0x00};
+        uint64_t transaction_time{};
+        char     client_order_id[20]{};
+        char     order_reject_reason{};
+        char     text[60]{};
+        uint8_t  reserved_internal{0x00};
+        uint8_t  num_return_bitfields{0};
+    };
+    
     #pragma pack(pop)
 }
