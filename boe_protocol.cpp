@@ -4,11 +4,34 @@ namespace boe
 {
     #pragma pack(push, 1)
 
+    constexpr uint16_t START_MESSAGE{0xBABA};
+
+    namespace msg_type
+    {
+        // Member to Cboe
+        constexpr uint8_t login_request         = 0x37;
+        constexpr uint8_t logout_request        = 0x02;
+        constexpr uint8_t client_heartbeat      = 0x03;
+        constexpr uint8_t new_order             = 0x38;
+        constexpr uint8_t cancel_order          = 0x39;
+
+        // Cboe to Member
+        constexpr uint8_t login_response        = 0x24;
+        constexpr uint8_t logout                = 0x08;
+        constexpr uint8_t server_heartbeat      = 0x09;
+        constexpr uint8_t replay_complete       = 0x13;
+        constexpr uint8_t order_acknowledgement = 0x25;
+        constexpr uint8_t order_rejected        = 0x26;
+        constexpr uint8_t order_cancelled       = 0x2A;
+        constexpr uint8_t cancel_rejected       = 0x2B;
+        constexpr uint8_t order_execution       = 0x2C;
+    }
+
     struct login_request
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{27}; 
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::login_request};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     session_sub_id[4]{};
@@ -19,9 +42,9 @@ namespace boe
 
     struct logout_request
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{8};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::logout_request};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
     };
@@ -31,18 +54,36 @@ namespace boe
     // it sends a Logout and closes the connection.
     struct client_hearbeat
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{8};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::client_heartbeat};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
     };
 
+    struct server_heartbeat 
+    {
+        uint16_t start_of_message{START_OF_MESSAGE};
+        uint16_t message_length{0x08};
+        uint8_t  message_type{msg_type::server_heartbeat};
+        uint8_t  matching_unit{0x00};
+        uint32_t sequence_number{0x00};
+    };
+
+    struct replay_complete
+    {
+        uint16_t start_of_message{START_OF_MESSAGE};
+        uint16_t message_length{0x08};
+        uint8_t  message_type{msg_type::replay_complete};
+        uint8_t  matching_unit{0x00};
+        uint32_t sequence_number{0x00};
+    };
+
     struct login_response
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::login_response};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     login_response_status[1]{};
@@ -55,9 +96,9 @@ namespace boe
 
     struct new_order
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::new_order};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     client_order_id[20]{};
@@ -74,9 +115,9 @@ namespace boe
 
     struct cancel_order
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::cancel_order};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
         char     client_order_id[20]{};
@@ -85,9 +126,9 @@ namespace boe
 
     struct order_acknowledgement
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::order_acknowledgement};
         uint8_t  matching_unit{0x00};
         uint32_t sequence_number{};
         uint64_t transaction_time{};    
@@ -99,9 +140,9 @@ namespace boe
 
     struct order_rejected
     {
-        uint16_t start_of_message{0xBABA};
+        uint16_t start_of_message{START_MESSAGE};
         uint16_t message_length{};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::order_rejected};
         uint8_t  matching_unit{0x00};
         uint32_t sequence_number{0x00};
         uint64_t transaction_time{};
@@ -115,7 +156,7 @@ namespace boe
     struct cancel_rejected {
         uint16_t start_of_message{START_OF_MESSAGE};
         uint16_t message_length{};
-        uint8_t  message_type{};
+        uint8_t  message_type{msg_type::cancel_rejected};
         uint8_t  matching_unit{0x00};
         uint32_t sequence_number{0x00};
         uint64_t transaction_time{};
@@ -126,5 +167,23 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
 
+    struct order_execution {
+        uint16_t start_of_message{START_OF_MESSAGE};
+        uint16_t message_length{};
+        uint8_t  message_type{msg_type::order_execution};
+        uint8_t  matching_unit{0x00};
+        uint32_t sequence_number{};
+        uint64_t transaction_time{};
+        char     cl_ord_id[20]{};
+        uint64_t exec_id{};
+        uint32_t last_shares{};
+        int64_t  last_px{};           
+        uint32_t leaves_qty{};
+        char     base_liquidity_indicator{};
+        char     sub_liquidity_indicator{0x00};
+        char     contra_broker[4]{};
+        uint8_t  reserved_internal{0x00};
+        uint8_t  num_return_bitfields{0};
+    };
     #pragma pack(pop)
 }
