@@ -1,4 +1,4 @@
-# ironbook — BOE Gateway + Matching Engine
+# BOE Gateway + Matching Engine
 
 A high-performance C++ order book and matching engine with a partial Cboe Binary Order Entry (BOE) wire protocol gateway layer.
 
