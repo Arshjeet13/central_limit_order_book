@@ -1,3 +1,6 @@
+#include "server.hpp"  
+#include "session.hpp"  
+
 #include <iostream>
 #include <cstring>
 #include <sys/types.h>    
@@ -5,8 +8,8 @@
 #include <netdb.h>        
 #include <arpa/inet.h>    
 #include <netinet/in.h>   
-#include <unistd.h>       
-
+#include <unistd.h>  
+ 
 #define PORT "8080"
 #define BACKLOG 10        // max queued connections
 
@@ -50,13 +53,15 @@ int main() {
     // accept
     // recv + send loop
     // close
+    
     addr_size = sizeof(their_addr);
     while(true){
-        char buffer[1024];
+        //char buffer[1024];
         clientfd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size);
+        run_session(clientfd);
 
-        int n = recv(clientfd, buffer, sizeof(buffer), 0);
-        send(clientfd, buffer, n, 0);
+        //int n = recv(clientfd, buffer, sizeof(buffer), 0);
+        //send(clientfd, buffer, n, 0);
 
         close(clientfd);
     }
