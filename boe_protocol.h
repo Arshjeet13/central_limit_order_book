@@ -29,7 +29,7 @@ namespace boe
     struct login_request
     {
         uint16_t start_of_message{START_OF_MESSAGE};
-        uint16_t message_length{27}; 
+        uint16_t message_length{}; 
         uint8_t  message_type{msg_type::login_request};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
@@ -42,7 +42,7 @@ namespace boe
     struct logout_request
     {
         uint16_t start_of_message{START_OF_MESSAGE};
-        uint16_t message_length{8};
+        uint16_t message_length{};
         uint8_t  message_type{msg_type::logout_request};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
@@ -165,7 +165,8 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
     
-    struct order_cancelled {
+    struct order_cancelled
+    {
         uint16_t start_of_message{START_OF_MESSAGE};
         uint16_t message_length{};
         uint8_t  message_type{msg_type::order_cancelled};
