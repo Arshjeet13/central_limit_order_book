@@ -5,7 +5,7 @@ A high-performance C++ order book and matching engine with a partial Cboe Binary
 ## Project Structure
 
 ```
-ironbook/
+central_limit_order_book/
 ├── boe/
 │   └── messages.hpp      — packed BOE message structs
 ├── engine/
