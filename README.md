@@ -2,6 +2,29 @@
 
 A high-performance C++ order book and matching engine with a partial Cboe Binary Order Entry (BOE) wire protocol gateway layer.
 
+## Roadmap
+
+**Version 1 — Single client (current)**
+Full order lifecycle with one client: login → new order → matching →
+execution reports → cancel → logout. Focus on correctness.
+
+**Version 2 — Heartbeat and session timeout**
+Idle detection with per-session timers. Server heartbeat after 1s of
+inactivity, logout and disconnect after 5s of silence from client.
+
+**Version 3 — Multiple clients**
+N clients connected simultaneously, each able to match against the others.
+Sequential handling — one client's messages processed at a time.
+
+**Version 4 — Concurrent clients**
+I/O multiplexing via epoll for true simultaneous client handling.
+Matching engine stays single-threaded; concurrency lives in the network layer.
+
+**Version 5 — Docker**
+Gateway and clients in separate containers on a Docker virtual network.
+Full system spins up with a single `docker compose up`.
+Enables realistic latency benchmarking and load testing at scale.
+
 ## Project Structure
 
 ```
