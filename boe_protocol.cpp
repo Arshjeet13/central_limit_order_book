@@ -7,7 +7,7 @@ namespace boe
     struct login_request
     {
         uint16_t start_of_message{0xBABA};
-        uint16_t message_length{27}; // The message length does not include the 2 start_of_message bytes
+        uint16_t message_length{27}; 
         uint8_t  message_type{0x37};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
@@ -20,7 +20,7 @@ namespace boe
     struct logout_request
     {
         uint16_t start_of_message{0xBABA};
-        uint16_t message_length{8}; // The message length does not include the 2 start_of_message bytes
+        uint16_t message_length{8};
         uint8_t  message_type{0x37};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
@@ -32,7 +32,7 @@ namespace boe
     struct client_hearbeat
     {
         uint16_t start_of_message{0xBABA};
-        uint16_t message_length{8}; // The message length does not include the 2 start_of_message bytes
+        uint16_t message_length{8};
         uint8_t  message_type{0x37};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
@@ -41,7 +41,7 @@ namespace boe
     struct login_response
     {
         uint16_t start_of_message{0xBABA};
-        uint16_t message_length{}; // The message length does not include the 2 start_of_message bytes
+        uint16_t message_length{};
         uint8_t  message_type{0x37};
         uint8_t  matching_unit{};
         uint32_t sequence_number{};
@@ -53,7 +53,30 @@ namespace boe
         uint8_t  number_of_param_groups{0x00};
     };    
 
-    
+    struct new_order
+    {
+        uint16_t start_of_message{0xBABA};
+        uint16_t message_length{};
+        uint8_t  message_type{0x37};
+        uint8_t  matching_unit{};
+        uint32_t sequence_number{};
+        char     client_order_id[20]{};
+        char     side{};
+        uint32_t order_qty{};
+        uint8_t  number_of_new_order_bitfields{1};
+        uint8_t  bitfield1{0x14};  // Price + OrdType
+        uint8_t  bitfield2{0x41};  // Symbol + Capacity
+        // optional fields
+        int64_t  price{};          // Binary Price
+        char     ord_type{};       // '1' = Market, '2' = Limit
+        char     symbol[8]{};     
+        char     capacity{'C'};
+    };
+
+    struct cancel_order
+    {
+        
+    };
 
     #pragma pack(pop)
 }
