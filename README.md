@@ -75,7 +75,33 @@ By default the C++ compiler adds padding between struct fields for alignment —
 
 The practical difference: if a byte value is `0xBA`, a `signed char` interprets it as `-70`. A `uint8_t` keeps it as `186`. Protocol fields are compared against hex constants — unsigned is always correct here.
 
-Additionally, `uint8_t*` arithmetic is clean and requires no casts: `buf += n` advances by exactly `n` bytes. `char*` requires the same math but `void*` buffers need explicit casts.
+### `Session` struct for per-connection state
+
+Each TCP connection requires state that persists between messages — whether
+the client is logged in, the outbound sequence number counter, the client's
+username. This state cannot live inside individual handlers (reset on every
+call) or as globals (breaks with multiple clients).
+
+`Session` is the memory that connects successive messages from the same client:
+
+- `fd` — the TCP socket file descriptor for this connection. All sends go
+  through this. Initialized to -1 as a sentinel for "no connection."
+- `logged_in` — set to true after a successful Login Request. Every handler
+  checks this before processing application messages. Orders arriving before
+  login are rejected.
+- `next_seq_num` — counter for outbound sequenced messages (Order Ack, Order
+  Execution, Order Cancelled). Stamped into sequence_number field of each
+  response before sending, then incremented. Per-session so each client has
+  an independent stream starting at 1.
+- `username` — echoed from Login Request. Stored for session identification
+  and future validation.
+
+Handlers receive a `Session&` reference and read/write it directly. The
+session is created when a client connects and destroyed when they disconnect.
+Rather than passing fd, logged_in, next_seq_num and username as separate
+parameters to every handler, Session bundles them into one struct — adding
+new per-connection state later means one field addition, not updating every
+function signature.
 
 ### `recv_exact` wrapper around `recv`
 
