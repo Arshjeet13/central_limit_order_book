@@ -7,7 +7,7 @@ A high-performance C++ order book and matching engine with a partial Cboe Binary
 ```
 ironbook/
 ├── boe/
-│   └── messages.hpp      — packed BOE message structs
+│   └── protocol.hpp      — packed BOE message structs
 ├── engine/
 │   ├── engine.hpp        — matching engine interface
 │   └── engine.cpp        — price-time priority matching logic
@@ -115,23 +115,6 @@ This is the standard approach for length-prefixed binary protocols.
 TCP transmits payload bytes exactly as given, preserving their order. Since BOE is little-endian and x86 is little-endian, no conversion is needed. The spec explicitly states: "All binary values are in Little Endian (used by Intel x86 processors), and not network byte order."
 
 A `from_le<T>()` template exists for future portability on big-endian architectures but is a no-op on x86.
-
-### `Session` struct for per-connection state
-
-Each TCP connection requires state that persists between messages — whether the client is logged in, the outbound sequence number counter, the client's username. This state cannot live inside individual handlers (reset on every call) or as globals (breaks with multiple clients).
-
-`Session` is the memory that connects successive messages from the same client:
-
-```cpp
-struct Session {
-    int      fd{-1};
-    bool     logged_in{false};
-    uint32_t next_seq_num{1};
-    char     username[4]{};
-};
-```
-
-Handlers receive a `Session&` reference and read/write it. The session is created when a client connects and destroyed when they disconnect.
 
 ### Separate sequence numbers per session
 
