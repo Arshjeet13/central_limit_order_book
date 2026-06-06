@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <concepts>
 
 namespace boe
 {
@@ -212,7 +213,7 @@ namespace boe
     
     // Section 4.2.11 : Sent when a cancel succeeds and the order is removed
     // from the book. Sequenced.
-    // cancel_reason: 'U' = user requested (default
+    // cancel_reason: 'U' = user requested (default), 'A' = administrative.
     struct order_cancelled
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -229,7 +230,7 @@ namespace boe
 
     // Section 4.2.14 : Sent when a cancel cannot be processed. Unsequenced.
     // cancel_reject_reason: 'I' = unknown order (ClOrdID not found),
-    // 'J' = too late (order alrea
+    // 'J' = too late (order already filled or cancelled).
     struct cancel_rejected
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -271,4 +272,17 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
     #pragma pack(pop)
+
+    template<typename T>
+    concept BoeMessage = requires(T msg) {
+        { msg.message_length } -> std::convertible_to<uint16_t>;
+        { msg.message_type   } -> std::convertible_to<uint8_t>;
+    };
+
+    template<BoeMessage T>
+    T make_message() {
+        T msg{};
+        msg.message_length = static_cast<uint16_t>(sizeof(T) - 2);
+        return msg;
+    }
 }
