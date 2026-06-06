@@ -26,6 +26,11 @@ namespace boe
     }
 
     #pragma pack(push, 1)
+
+    // Section 3.1.1 : First message sent on connect. Must be received before any
+    // application messages. Gateway responds with login_response + replay_complete.
+    // If credentials are invalid, gateway sends login_response with non-'A' status
+    // and closes the connection immediately.
     struct login_request
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -39,6 +44,9 @@ namespace boe
         uint8_t  number_of_param_groups{0x00};
     };
 
+    // Section 3.1.2 : Sent by client to initiate graceful disconnect. Gateway
+    // finishes sending any queued data, responds with logout, then closes the
+    // TCP connection.
     struct logout_request
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -48,6 +56,11 @@ namespace boe
         uint32_t sequence_number{};
     };
 
+    // Section 3.2.2 : Sent by gateway to confirm disconnect, either in response
+    // to a logout_request or unsolicited (protocol violation, end of day, idle
+    // timeout). Client should not send any messages after receiving this.
+    // LogoutReason: 'U' = user requested, 'E' = end of day,
+    //               'A' = administrative, '!' = protocol violation
     struct logout
     {
     uint16_t start_of_message{START_OF_MESSAGE};
@@ -61,9 +74,10 @@ namespace boe
     uint8_t  number_of_units{0x00};
     };
 
-    // From section 2.4 : if no data has been sent in either direction for 1 second, 
-    // both sides send heartbeats. If the server receives nothing from you for 5 seconds
-    // it sends a Logout and closes the connection.
+    // Section 2.4 : Sent by either side when no data has been exchanged for 1
+    // second. Resets the idle timer. If the gateway receives nothing for 5
+    // seconds it sends logout and closes the connection.
+
     struct client_heartbeat
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -73,6 +87,9 @@ namespace boe
         uint32_t sequence_number{};
     };
 
+    // Section 2.4 : Gateway-side keepalive. Sent when no outbound data has been
+    // sent for 1 second. Client should respond with client_heartbeat if it has
+    // nothing else to send.
     struct server_heartbeat 
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -82,6 +99,10 @@ namespace boe
         uint32_t sequence_number{0x00};
     };
 
+    // Section 3.2.4 : Sent immediately after login_response to signal that replay
+    // is complete. Client must not send orders until this is received. This gateway
+    // has no replay mechanism so replay_complete is always sent immediately with
+    // no messages in between.
     struct replay_complete
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -91,6 +112,10 @@ namespace boe
         uint32_t sequence_number{0x00};
     };
 
+    // Section 3.2.1 : Gateway response to login_request.
+    // login_response_status: 'A' = accepted, 'N' = not authorized,
+    // 'B' = session already in use, 'D' = session disabled.
+    // Always followed by replay_complete on successful login.
     struct login_response
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -106,6 +131,13 @@ namespace boe
         uint8_t  number_of_param_groups{0x00};
     };    
 
+    // Section 4.1.1 : Submit a new limit or market order.
+    // Side: '1' = Buy, '2' = Sell.
+    // OrdType: '1' = Market, '2' = Limit (default if omitted).
+    // Price is Binary Price — 4 implied decimal places ($1.50 = 15000).
+    // ClOrdID must be unique among all currently live orders.
+    // Gateway responds with order_acknowledgement or order_rejected.
+    // If the order crosses the book, order_execution is also sent.
     struct new_order
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -125,6 +157,12 @@ namespace boe
         char     capacity{'C'};
     };
 
+    // Section 4.1.5 : Cancel a resting order by its original ClOrdID.
+    // OrigClOrdID must match the ClOrdID of a live resting order.
+    // Set OrigClOrdID to all zeroes for mass cancel.
+    // Gateway responds with order_cancelled or cancel_rejected.
+    // No ClOrdID field — a cancel creates nothing new, it only references
+    // an existing order.
     struct cancel_order
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -136,6 +174,9 @@ namespace boe
         uint8_t  number_of_cancel_order_bitfields{0};
     };
 
+    // Section 4.2.1 : Sent when a new order is accepted and resting on the book.
+    // Sequenced. OrderID is gateway-assigned, independent of ClOrdID.
+    // If the order immediately crosses and fills, order_execution follows.
     struct order_acknowledgement
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -150,6 +191,10 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
 
+    // Section 4.2.4 : Sent when a new order fails validation before reaching
+    // the book. Unsequenced — rejections are never replayed.
+    // order_reject_reason codes: 'D' = duplicate ClOrdID, 'K' = invalid price,
+    // 'Z' = invalid quantity, 'S' = unknown symbol, 'A' = administrative.
     struct order_rejected
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -165,6 +210,9 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
     
+    // Section 4.2.11 : Sent when a cancel succeeds and the order is removed
+    // from the book. Sequenced.
+    // cancel_reason: 'U' = user requested (default
     struct order_cancelled
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -179,6 +227,9 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
 
+    // Section 4.2.14 : Sent when a cancel cannot be processed. Unsequenced.
+    // cancel_reject_reason: 'I' = unknown order (ClOrdID not found),
+    // 'J' = too late (order alrea
     struct cancel_rejected
     {
         uint16_t start_of_message{START_OF_MESSAGE};
@@ -194,6 +245,13 @@ namespace boe
         uint8_t  num_return_bitfields{0};
     };
 
+    // Section 4.2.15 : Sent when a fill occurs. Sequenced.
+    // Sent TWICE per fill — once to the aggressor (BaseLiquidityIndicator = 'R',
+    // Removed Liquidity) and once to the resting order owner
+    // (BaseLiquidityIndicator = 'A', Added Liquidity). Both messages carry the
+    // same ExecID and LastPx.
+    // LeavesQty = 0 means fully filled. LeavesQty > 0 means partial fill,
+    // remainder still resting on book.
     struct order_execution {
         uint16_t start_of_message{START_OF_MESSAGE};
         uint16_t message_length{};
