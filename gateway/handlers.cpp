@@ -74,18 +74,49 @@ void handle_login_request(Session& session, const boe::login_request& login_requ
     send_message(session.fd, &replay_complete, sizeof(replay_complete));
 }
 
+boe::logout make_logout_message(char logout_reason){
+    auto logout = boe::make_message<boe::logout>();
+    logout.logout_reason = logout_reason;
+    logout.last_received_sequence_number = 0;
+
+    std::string logout_reason_text;
+
+    switch (logout_reason){
+        case boe::logout_reason::user_requested:
+            logout_reason_text = "User requested logout";
+            break;
+        
+        case boe::logout_reason::end_of_day:
+            logout_reason_text = "End of day";
+            break;
+
+        case boe::logout_reason::protocol_violation:
+            logout_reason_text = "Protocol violation";
+            break;
+
+        case boe::logout_reason::administrative:
+            logout_reason_text = "Administrative logout";
+            break;
+    }
+
+    memcpy(logout.logout_reason_text, logout_reason_text.c_str(), logout_reason_text.size());
+
+    return logout;
+}
+
 void handle_logout_request(Session& session, const boe::logout_request& logout_request){
     session.logged_in = false;
-    auto logout = boe::make_message<boe::logout>();
-    logout.logout_reason = 'U'; // 'U' = user requested, per BOE spec section 8.1
-    logout.last_received_sequence_number = 0;
-    std::string logout_reason_text = "User requested logout";
-    memcpy(logout.logout_reason_text, logout_reason_text.c_str(), logout_reason_text.size());
+
+    auto logout = make_logout_message(boe::logout_reason::user_requested);    
 
     send_message(session.fd, &logout, sizeof(logout));
     close(session.fd); // recv_exact in session.cpp will now return false, breaking the while true loop
                        // and hence relinquishing control over to server.cpp, which will continue listening
                        // for further connections
     session.fd = -1;
+}
+
+void handle_new_order(Session& session, const boe::new_order new_order){
+
 }
 
