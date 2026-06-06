@@ -9,6 +9,7 @@ struct Session
     bool     logged_in{false};
     uint32_t next_seq_num{1};
     char     username[4]{};
+    char     session_sub_id[4]{};
 };
 
 // starts the recv loop for a connected client
