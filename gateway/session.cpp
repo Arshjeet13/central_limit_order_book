@@ -41,8 +41,10 @@ void run_session(int fd){
             break;
         }
 
-        // TO DO : some parse function
-        // TO DO : make Session object
+        Session session;
+        session.fd = fd;
+
+        parse_message(session, buffer);
                         
     }
 }
