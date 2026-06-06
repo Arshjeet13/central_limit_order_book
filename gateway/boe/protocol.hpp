@@ -26,6 +26,73 @@ namespace boe
         constexpr uint8_t order_execution       = 0x2C;
     }
 
+    namespace side
+    {
+        constexpr char buy  = '1';
+        constexpr char sell = '2';
+    }
+
+    namespace ord_type
+    {
+        constexpr char market = '1';
+        constexpr char limit  = '2';
+    }
+
+    namespace capacity
+    {
+        constexpr char customer         = 'C';
+        constexpr char firm             = 'F';
+        constexpr char market_maker     = 'M';
+        constexpr char professional     = 'U';
+    }
+
+    namespace login_status 
+    {
+        constexpr char accepted         = 'A';
+        constexpr char not_authorized   = 'N';
+        constexpr char already_in_use   = 'B';
+        constexpr char session_disabled = 'D';
+        constexpr char invalid_session  = 'S';
+        constexpr char invalid_structure = 'M';
+    }
+
+    namespace reject_reason 
+    {
+        constexpr char duplicate_cl_ord_id = 'D';
+        constexpr char invalid_price       = 'K';
+        constexpr char invalid_quantity    = 'Z';
+        constexpr char unknown_symbol      = 'S';
+        constexpr char administrative      = 'A';
+        constexpr char not_logged_in       = '>';
+    }
+
+    namespace cancel_reject_reason
+    {
+        constexpr char unknown_order = 'I';
+        constexpr char too_late      = 'J';
+        constexpr char administrative = 'A';
+    }
+
+    namespace logout_reason
+    {
+        constexpr char user_requested      = 'U';
+        constexpr char end_of_day          = 'E';
+        constexpr char administrative      = 'A';
+        constexpr char protocol_violation  = '!';
+    }
+
+    namespace cancel_reason 
+    {
+        constexpr char user_requested = 'U';
+        constexpr char administrative = 'A';
+    }
+
+    namespace liquidity
+    {
+        constexpr char added   = 'A';
+        constexpr char removed = 'R';
+    }
+
     #pragma pack(push, 1)
 
     // Section 3.1.1 : First message sent on connect. Must be received before any
