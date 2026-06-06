@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <sys/socket.h> 
+#include <unistd.h>
 
 void send_message(int fd, const void* data, int len){
 
@@ -41,8 +42,7 @@ boe::replay_complete make_replay_complete(){
     return replay_complete;
 }
 
-void handle_login_request(Session& session, const boe::login_request& login_request)
-{
+void handle_login_request(Session& session, const boe::login_request& login_request){
     if(login_request.matching_unit != 0 || login_request.sequence_number != 0){
         auto login_response = make_login_response('M');
         send_message(session.fd, &login_response, sizeof(login_response));
@@ -73,3 +73,19 @@ void handle_login_request(Session& session, const boe::login_request& login_requ
     send_message(session.fd, &login_response, sizeof(login_response));
     send_message(session.fd, &replay_complete, sizeof(replay_complete));
 }
+
+void handle_logout_request(Session& session, const boe::logout_request& logout_request){
+    session.logged_in = false;
+    auto logout = boe::make_message<boe::logout>();
+    logout.logout_reason = 'U'; // 'U' = user requested, per BOE spec section 8.1
+    logout.last_received_sequence_number = 0;
+    std::string logout_reason_text = "User requested logout";
+    memcpy(logout.logout_reason_text, logout_reason_text.c_str(), logout_reason_text.size());
+
+    send_message(session.fd, &logout, sizeof(logout));
+    close(session.fd); // recv_exact in session.cpp will now return false, breaking the while true loop
+                       // and hence relinquishing control over to server.cpp, which will continue listening
+                       // for further connections
+    session.fd = -1;
+}
+
