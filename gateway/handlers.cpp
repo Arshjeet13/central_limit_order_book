@@ -117,6 +117,6 @@ void handle_logout_request(Session& session, const boe::logout_request& logout_r
 }
 
 void handle_new_order(Session& session, const boe::new_order new_order){
-
+    
 }
 
