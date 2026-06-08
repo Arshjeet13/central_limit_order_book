@@ -1,6 +1,6 @@
 #include "server.hpp"  
 #include "session.hpp"  
-
+#include "../engine/engine.hpp"
 #include <iostream>
 #include <cstring>
 #include <sys/types.h>    
@@ -13,7 +13,7 @@
 #define PORT "8080"
 #define BACKLOG 10        // max queued connections
 
-int main() {
+int run_server(MatchingEngine &engine){
 
     struct sockaddr_storage their_addr;
     socklen_t addr_size;
@@ -58,7 +58,7 @@ int main() {
     while(true){
         //char buffer[1024];
         clientfd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size);
-        run_session(clientfd);
+        run_session(clientfd, engine);
 
         //int n = recv(clientfd, buffer, sizeof(buffer), 0);
         //send(clientfd, buffer, n, 0);
