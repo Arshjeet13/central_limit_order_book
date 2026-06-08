@@ -7,6 +7,10 @@
 #include <utility>
 #include <sys/socket.h> 
 #include <unistd.h>
+#include <vector>
+
+static int next_engine_seq_num = 0;
+static std::unordered_map<int, std::array<char, 20>> seq_to_cl_ord_id;
 
 void send_message(int fd, const void* data, int len){
 
@@ -117,7 +121,30 @@ void handle_logout_request(Session& session, const boe::logout_request& logout_r
     session.fd = -1;
 }
 
-void handle_new_order(Session& session, const boe::new_order new_order, MatchingEngine& engine){
-    
+void handle_new_order(Session& session, const boe::new_order& new_order, MatchingEngine& engine){
+    next_engine_seq_num++;
+
+    std::array<char, 20> cl_ord_id{};
+    memcpy(cl_ord_id.data(), new_order.cl_ord_id, 20);
+    seq_to_cl_ord_id[next_engine_seq_num] = cl_ord_id;
+
+    std::vector<Trade> fills;
+
+    Side side = (new_order.side == boe::side::buy ? Side::buy : Side::sell);
+    if(new_order.ord_type == boe::ord_type::market){
+        fills = engine.submit_market_order(next_engine_seq_num, side, 
+                                           new_order.symbol, new_order.order_qty);
+    }
+    else{
+        fills = engine.submit_limit_order(next_engine_seq_num, side, 
+                                          new_order.symbol, new_order.order_qty,
+                                          new_order.price);
+    }
+
+    for(Trade& fill : fills){
+        std::array<char, 20UL> cl_ord_id_buy  = seq_to_cl_ord_id[fill.seq_num_buy];
+        std::array<char, 20UL> cl_ord_id_sell = seq_to_cl_ord_id[fill.seq_num_sell];
+        // TO DO : send messages
+    }
 }
 
