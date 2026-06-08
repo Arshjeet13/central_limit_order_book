@@ -6,8 +6,8 @@
 #include <vector>
 #include <cstdint>
 
-enum class Side   : char { Buy = '1', Sell = '2' };
-enum class OrdType: char { Market = '1', Limit = '2' };
+enum class Side   : char { buy = '1', sell = '2' };
+enum class OrdType: char { market = '1', limit = '2' };
 
 struct Trade {
     int      trade_id;

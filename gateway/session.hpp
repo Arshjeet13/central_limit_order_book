@@ -8,7 +8,7 @@ struct Session
 {
     int      fd{-1};
     bool     logged_in{false};
-    uint32_t next_seq_num{1};
+    uint32_t next_seq_num{1}; // server side sequence number, which id's messages sent to client
     char     username[4]{};
     char     session_sub_id[4]{};
 };

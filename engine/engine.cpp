@@ -7,7 +7,7 @@ std::vector<Trade> MatchingEngine::submit_market_order(int seq_num, Side side,
                                                        uint32_t qty){
     std::vector<Trade> fills;
 
-    Order incoming{seq_num, OrdType::Market, side, {}, qty, 0};
+    Order incoming{seq_num, OrdType::market, side, {}, qty, 0};
     strncpy(incoming.symbol, symbol, 8);
 
     auto it = books_.find(std::string(symbol, 8));
@@ -23,14 +23,14 @@ std::vector<Trade> MatchingEngine::submit_limit_order(int seq_num, Side side,
                                                        uint32_t qty, int64_t price) {
     std::vector<Trade> fills;
 
-    Order incoming{seq_num, OrdType::Limit, side, {}, qty, price};
+    Order incoming{seq_num, OrdType::limit, side, {}, qty, price};
     strncpy(incoming.symbol, symbol, 8);
 
     SymbolBook& book = books_[std::string(symbol, 8)];
     match(incoming, book, fills);
 
     if (incoming.qty > 0) {
-        if (side == Side::Buy)
+        if (side == Side::buy)
             book.buy_side[price][seq_num] = incoming;
         else
             book.sell_side[price][seq_num] = incoming;
@@ -44,7 +44,7 @@ bool MatchingEngine::cancel_order(int seq_num, int64_t price,
     if (book_it == books_.end()) return false;
     SymbolBook& book = book_it->second;
 
-    auto& side_map = (side == Side::Buy) ? book.buy_side : book.sell_side;
+    auto& side_map = (side == Side::buy) ? book.buy_side : book.sell_side;
     auto price_it = side_map.find(price);
     if (price_it == side_map.end()) return false;
 
@@ -78,8 +78,8 @@ std::vector<Order> MatchingEngine::get_orderbook_snapshot() const {
 // Execution price is always the resting order's price.
 void MatchingEngine::match(Order& incoming, SymbolBook& book,
                             std::vector<Trade>& fills) {
-    bool is_buy    = (incoming.side == Side::Buy);
-    bool is_market = (incoming.ord_type == OrdType::Market);
+    bool is_buy    = (incoming.side == Side::buy);
+    bool is_market = (incoming.ord_type == OrdType::market);
 
     while(incoming.qty > 0){
         if(is_buy){
