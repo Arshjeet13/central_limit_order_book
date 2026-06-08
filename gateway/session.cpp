@@ -1,11 +1,11 @@
 #include "session.hpp"
 #include "parser.hpp"
-
-#include <sys/socket.h>   // recv, send
-#include <unistd.h>       // close
-#include <cstring>        // memcpy
-#include <cstdint>        // uint8_t, uint16_t
-#include <vector>         // message buffer
+#include "../engine/engine.hpp"
+#include <sys/socket.h>   
+#include <unistd.h>
+#include <cstring>     
+#include <cstdint>        
+#include <vector>        
 
 bool recv_exact(int fd, uint8_t* buffer, int n_bytes){
     while(n_bytes > 0){
@@ -19,7 +19,7 @@ bool recv_exact(int fd, uint8_t* buffer, int n_bytes){
     return true;
 }
 
-void run_session(int fd){
+void run_session(int fd, MatchingEngine& engine){
 
     while (true){
         // read 2 bytes get START_OF_MESSAGE    
@@ -44,7 +44,6 @@ void run_session(int fd){
         Session session;
         session.fd = fd;
 
-        parse_message(session, buffer);
-                        
+        parse_message(session, buffer, engine);
     }
 }

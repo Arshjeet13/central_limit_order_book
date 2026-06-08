@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../engine/engine.hpp"
 #include <cstdint>
 #include <cstring>
 
@@ -13,7 +14,7 @@ struct Session
 };
 
 // starts the recv loop for a connected client
-void run_session(int fd);
+void run_session(int fd, MatchingEngine& engine);
 
 // reads exactly n_bytes from fd into buf
 // returns false on disconnect or error
