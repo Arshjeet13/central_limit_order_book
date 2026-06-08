@@ -1,5 +1,6 @@
 #include "session.hpp"
 #include "boe/protocol.hpp"
+#include "../engine/engine.hpp"
 #include "database.hpp"
 #include <cstdint>
 #include <string>
@@ -42,7 +43,7 @@ boe::replay_complete make_replay_complete(){
     return replay_complete;
 }
 
-void handle_login_request(Session& session, const boe::login_request& login_request){
+void handle_login_request(Session& session, const boe::login_request& login_request, MatchingEngine& engine){
     if(login_request.matching_unit != 0 || login_request.sequence_number != 0){
         auto login_response = make_login_response('M');
         send_message(session.fd, &login_response, sizeof(login_response));
@@ -104,7 +105,7 @@ boe::logout make_logout_message(char logout_reason){
     return logout;
 }
 
-void handle_logout_request(Session& session, const boe::logout_request& logout_request){
+void handle_logout_request(Session& session, const boe::logout_request& logout_request, MatchingEngine& engine){
     session.logged_in = false;
 
     auto logout = make_logout_message(boe::logout_reason::user_requested);    
@@ -116,7 +117,7 @@ void handle_logout_request(Session& session, const boe::logout_request& logout_r
     session.fd = -1;
 }
 
-void handle_new_order(Session& session, const boe::new_order new_order){
+void handle_new_order(Session& session, const boe::new_order new_order, MatchingEngine& engine){
     
 }
 
