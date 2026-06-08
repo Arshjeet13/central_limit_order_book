@@ -6,25 +6,25 @@
 #include <cstdint>   
 #include <cstring>    
 
-bool parse_message(Session& session, const uint8_t* buffer){
+bool parse_message(Session& session, const uint8_t* buffer, MatchingEngine& engine){
     uint8_t message_type{};
     message_type = buffer[4]; // since message_type is stored in the 4th byte in every message
 
     switch(message_type){
         case boe::msg_type::login_request:     
-            handle_login_request(session, *reinterpret_cast<const boe::login_request*> (buffer));   
+            handle_login_request(session, *reinterpret_cast<const boe::login_request*> (buffer), engine);   
             break;
 
         case boe::msg_type::logout_request:
-            handle_logout_request(session, *reinterpret_cast<const boe::logout_request*> (buffer));
+            handle_logout_request(session, *reinterpret_cast<const boe::logout_request*> (buffer), engine);
             break;
 
         case boe::msg_type::new_order:
-            handle_new_order(session, *reinterpret_cast<const boe::new_order*> (buffer));
+            handle_new_order(session, *reinterpret_cast<const boe::new_order*> (buffer), engine);
             break;
 
         case boe::msg_type::cancel_order:
-            handle_cancel_order(session, *reinterpret_cast<const boe::cancel_order*> (buffer));
+            handle_cancel_order(session, *reinterpret_cast<const boe::cancel_order*> (buffer), engine);
             break;
 
         // case boe::msg_type::client_heartbeat:
