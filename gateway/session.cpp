@@ -21,6 +21,8 @@ bool recv_exact(int fd, uint8_t* buffer, int n_bytes){
 
 void run_session(int fd, MatchingEngine& engine){
 
+    Session session;
+
     while (true){
         // read 2 bytes get START_OF_MESSAGE    
         // read 2 bytes to get msg_len
@@ -41,7 +43,6 @@ void run_session(int fd, MatchingEngine& engine){
             break;
         }
 
-        Session session;
         session.fd = fd;
 
         parse_message(session, buffer, engine);
