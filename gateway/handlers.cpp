@@ -124,6 +124,10 @@ void handle_logout_request(Session& session, const boe::logout_request& logout_r
 void handle_new_order(Session& session, const boe::new_order& new_order, MatchingEngine& engine){
     next_engine_seq_num++;
 
+    auto order_ack = boe::make_message<boe::order_acknowledgement>();
+    memcpy(order_ack.cl_ord_id, new_order.cl_ord_id, 20);
+    send_message(session.fd, &order_ack, sizeof(order_ack));
+
     std::array<char, 20> cl_ord_id{};
     memcpy(cl_ord_id.data(), new_order.cl_ord_id, 20);
     seq_to_cl_ord_id[next_engine_seq_num] = cl_ord_id;
