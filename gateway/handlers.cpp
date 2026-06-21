@@ -148,7 +148,8 @@ void handle_new_order(Session& session, const boe::new_order& new_order, Matchin
     for(Trade& fill : fills){
         std::array<char, 20UL> cl_ord_id_buy  = seq_to_cl_ord_id[fill.seq_num_buy];
         std::array<char, 20UL> cl_ord_id_sell = seq_to_cl_ord_id[fill.seq_num_sell];
-        // TO DO : send messages
+        
+        
     }
 }
 
